@@ -120,6 +120,7 @@ function render() {
   if (S.tab === 'vocab') bindVocab(view, vocabHost);
   if (S.tab === 'today') bindToday(view, todayHost);
   if (S.tab === 'practice') bindPractice(view, practiceHost);
+  if (S.tab === 'settings') showVersion(view);
   updateBadge();
 }
 
@@ -542,7 +543,8 @@ function viewSettings() {
     英和辞書: <a href="https://github.com/kujirahand/EJDict" target="_blank" rel="noopener">EJDict-hand</a>（CC0）／ 英英辞書: <a href="https://freedictionaryapi.com/" target="_blank" rel="noopener">Free Dictionary API</a>（Wiktionary）<br>
     発音記号: <a href="https://github.com/cmusphinx/cmudict" target="_blank" rel="noopener">CMU Pronouncing Dictionary</a>（© Carnegie Mellon University, BSDライセンス）を英和辞典式の表記に変換<br>
     和訳: <a href="https://mymemory.translated.net/" target="_blank" rel="noopener">MyMemory</a>（機械翻訳）<br>
-    単語の頻度順位: <a href="https://github.com/rspeer/wordfreq" target="_blank" rel="noopener">wordfreq</a>（Robyn Speer, CC BY-SA 4.0）をもとに作成</p>`;
+    単語の頻度順位: <a href="https://github.com/rspeer/wordfreq" target="_blank" rel="noopener">wordfreq</a>（Robyn Speer, CC BY-SA 4.0）をもとに作成</p>
+    <p class="muted small app-version" id="app-version">アプリのバージョン: <span>…</span> <button class="link-btn">最新版を確認</button></p>`;
 }
 
 // ---------- events
@@ -933,7 +935,44 @@ async function init() {
   db.requestPersistence();
   // On localhost the service worker would serve stale files while developing; opt in with ?sw.
   const dev = location.hostname === 'localhost' && !location.search.includes('sw');
-  if ('serviceWorker' in navigator && !dev) navigator.serviceWorker.register('sw.js').catch(() => {});
+  if ('serviceWorker' in navigator && !dev) {
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker
+      .register('sw.js')
+      .then((reg) => {
+        // An installed app is usually resumed rather than reopened: look for a new version whenever it comes back.
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') reg.update().catch(() => {});
+        });
+      })
+      .catch(() => {});
+    // A new version took over: reload once so its files are used (but never in the middle of a session).
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController) return;
+      if (document.body.classList.contains('reading') || document.body.classList.contains('training-open')) {
+        toast('新しいバージョンがあります。アプリを開き直すと更新されます', 5000);
+      } else location.reload();
+    });
+  }
+}
+
+/** Settings footer: which version is running, and a button to fetch the latest one. */
+async function showVersion(view) {
+  const el = view.querySelector('#app-version');
+  if (!el) return;
+  const keys = 'caches' in window ? await caches.keys().catch(() => []) : [];
+  const shell = keys.find((k) => k.startsWith('shell-'));
+  el.querySelector('span').textContent = shell ? shell.replace('shell-', '') : '開発版';
+  el.querySelector('button').onclick = async () => {
+    const reg = await navigator.serviceWorker?.getRegistration();
+    if (!reg) return toast('オフライン用の仕組みが無効です（開発版）');
+    try {
+      await reg.update();
+    } catch {
+      return toast('更新を確認できませんでした（オフライン？）');
+    }
+    toast(reg.installing || reg.waiting ? '新しいバージョンを読み込んでいます…（自動で再読み込みします）' : '最新のバージョンです', 4000);
+  };
 }
 
 init();

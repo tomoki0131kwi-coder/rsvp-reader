@@ -1,5 +1,5 @@
 // Offline support. App shell: stale-while-revalidate. Books, dictionary, catalog: cache-first.
-const SHELL_CACHE = 'shell-v15';
+const SHELL_CACHE = 'shell-v16';
 const DATA_CACHE = 'data-v1'; // bump only when bundled books/dictionary change
 const SHELL = [
   './', 'index.html', 'app.css', 'manifest.webmanifest',
@@ -8,7 +8,7 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(SHELL_CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(SHELL_CACHE).then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {
@@ -40,7 +40,7 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.open(SHELL_CACHE).then(async (c) => {
       const hit = await c.match(req, { ignoreSearch: true });
-      const net = fetch(req)
+      const net = fetch(req, { cache: 'no-cache' })
         .then((res) => {
           if (res.ok) c.put(req, res.clone());
           return res;
