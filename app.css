@@ -398,6 +398,7 @@ button.card:active, .card.book:active { transform: scale(0.99); }
 .review-box small { color: var(--muted); }
 .empty-vocab { display: block; line-height: 1.7; }
 .empty-vocab p + p { margin-top: 8px; }
+.empty-vocab b { font-size: inherit; font-variant-numeric: normal; }
 .word-list { margin-top: 12px; }
 .word-item { padding: 11px 14px; margin-bottom: 8px; }
 .word-item[hidden] { display: none; }
