@@ -1,0 +1,4 @@
+data/composition.json: English-Japanese sentence pairs from Tatoeba (https://tatoeba.org),
+licensed under CC BY 2.0 FR (https://creativecommons.org/licenses/by/2.0/fr/).
+Each item starts with the Tatoeba sentence number of the English sentence (https://tatoeba.org/sentences/show/<number>),
+where the contributors of the sentence and its translation are listed.

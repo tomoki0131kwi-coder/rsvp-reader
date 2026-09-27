@@ -1,0 +1,7 @@
+Word ranking in these files is derived from wordfreq (https://github.com/rspeer/wordfreq),
+by Robyn Speer, whose data is licensed under CC BY-SA 4.0
+(https://creativecommons.org/licenses/by-sa/4.0/). The derived ranking is shared under the same license.
+
+Japanese meanings: EJDict-hand (https://github.com/kujirahand/EJDict), CC0.
+Pronunciations: CMU Pronouncing Dictionary, converted (see ../pron/LICENSE.txt).
+Example sentences: taken from the bundled books (see ../credits.json and Project Gutenberg / VOA / Global Storybooks).

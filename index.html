@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f4ee">
+  <meta name="description" content="RSVP（高速逐次提示）で英語の多読ができるリーダー">
+  <title>RSVP多読</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <main id="view" class="view"></main>
+
+  <nav class="tabbar">
+    <button data-tab="today" data-icon="check">今日</button>
+    <button data-tab="library" data-icon="shelf">本</button>
+    <button data-tab="practice" data-icon="mic">練習</button>
+    <button data-tab="vocab" data-icon="cards">単語</button>
+    <button data-tab="stats" data-icon="chart">記録</button>
+    <button data-tab="settings" data-icon="gear">設定</button>
+  </nav>
+
+  <section id="reader" class="reader" hidden>
+    <header class="r-top">
+      <button id="r-back" class="icon-btn" aria-label="本棚へ戻る"></button>
+      <div class="r-title"><div id="r-book"></div><div id="r-chapter"></div></div>
+      <button id="r-listen" class="icon-btn" aria-label="聞き読みモード" aria-pressed="false"></button>
+      <button id="r-toc" class="icon-btn" aria-label="目次"></button>
+    </header>
+    <div id="stage" class="stage">
+      <div class="guide g-top"></div>
+      <div id="word" class="word"><span></span><span class="pivot"></span><span></span></div>
+      <div class="guide g-bottom"></div>
+      <div class="stage-hint">タップで再生／一時停止</div>
+    </div>
+    <div id="context" class="context" hidden></div>
+    <div class="r-bottom">
+      <input type="range" id="r-progress" min="0" max="1" step="1" value="0" aria-label="読書位置">
+      <div class="r-meta"><span id="r-pct">0%</span><span id="r-left"></span></div>
+      <div class="r-controls">
+        <button id="r-prev-sent" class="ctl" aria-label="前の文"></button>
+        <button id="r-back10" class="ctl text" aria-label="10語戻る">−10</button>
+        <button id="r-play" class="play" aria-label="再生"></button>
+        <button id="r-fwd10" class="ctl text" aria-label="10語進む">+10</button>
+        <button id="r-next-sent" class="ctl" aria-label="次の文"></button>
+      </div>
+      <div class="r-speed">
+        <button id="r-slower" class="ctl small" aria-label="遅く">−</button>
+        <span><b id="r-wpm">250</b> WPM</span>
+        <button id="r-faster" class="ctl small" aria-label="速く">＋</button>
+        <button id="r-mode" class="mode-btn" aria-label="表示単位を切り替え">1語</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-backdrop"></div>
+    <div class="sheet-panel" role="dialog" aria-modal="true"></div>
+  </div>
+
+  <div id="loading" class="loading-overlay" hidden><div class="spinner"></div><p>本を準備しています…</p></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <input type="file" id="file-input" accept=".txt,text/plain" hidden>
+  <input type="file" id="backup-input" accept=".json,application/json" hidden>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
