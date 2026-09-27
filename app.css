@@ -842,3 +842,16 @@ mark { background: var(--accent-soft); color: inherit; border-radius: 3px; paddi
 .gm-list.open .gm-ch { border-bottom: 1px solid var(--line); }
 .gm-list { margin-bottom: 8px; }
 .ctx-say { align-self: flex-start; text-decoration: none; color: var(--primary); font-size: 13.5px; padding: 2px 0; }
+
+/* word card: example translation and grammar notes */
+.ex-help { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.ex-help .rv-label small { font-weight: 400; }
+.ex-ja[hidden] { display: none; }
+.ex-ja { margin: 0 0 4px; font-size: 14.5px; line-height: 1.65; }
+.ex-gram { display: flex; flex-direction: column; gap: 6px; }
+.ex-gram-item {
+  display: flex; flex-direction: column; gap: 2px; text-align: left; border: 1px solid var(--line); background: var(--surface-2);
+  color: var(--text); border-radius: 10px; padding: 8px 10px; font-size: 13px; line-height: 1.55;
+}
+.ex-gram-item b { font-size: 13.5px; color: var(--primary); }
+.ex-gram-match { font-family: var(--serif); font-size: 13.5px; color: var(--accent); }

@@ -2,6 +2,7 @@
 // and the multiple-choice check test (目標9割).
 import * as vocab from './vocab.js';
 import { speak, NO_VOICE_HELP } from './speech.js';
+import { translate, QuotaError } from './translate.js';
 import { $, esc, icons, openSheet, closeSheet, pushLayer, popLayer, toast } from './ui.js';
 
 const GRADES = [
@@ -335,6 +336,9 @@ export async function startReview(host) {
           ${type === 'cloze' ? `<div class="rv-word">${esc(e.word)} ${speakBtn}</div>${e.pron ? `<div class="rv-pron">/${esc(e.pron)}/</div>` : ''}<p class="rv-ctx">${contextHtml(e)}</p>${ctxBtn}` : ''}
           <ol>${senses(e.meaning, 5).map((s) => `<li>${fmtSense(s)}</li>`).join('') || '<li class="muted">（英和辞書に未収録）</li>'}</ol>
           ${e.bookTitle ? `<cite>${esc(e.bookTitle)}</cite>` : ''}
+          ${e.ctx && host.settings.exampleHelp ? `<div class="ex-help">
+            <div class="rv-label">例文の和訳 <small>機械翻訳</small></div><button class="link-btn ctx-say ex-ja-btn" data-a="show-ja">和訳を表示</button><p class="ex-ja" hidden></p>
+            <div class="rv-label">例文の文法 <small>形から自動で判定（目安）</small></div><div class="ex-gram"></div></div>` : ''}
         </div>`
       : '';
     const actions = revealed
@@ -348,11 +352,47 @@ export async function startReview(host) {
     el.querySelectorAll('[data-a=speak]').forEach((b) => (b.onclick = () => say(e.word, host.settings)));
     el.querySelectorAll('[data-a=say-ctx]').forEach((b) => (b.onclick = () => say(e.ctx.join(' '), host.settings)));
     el.querySelectorAll('[data-g]').forEach((b) => (b.onclick = () => answer(Number(b.dataset.g))));
+    if (revealed && el.querySelector('.ex-help')) exampleHelp(e);
     // Read the word out once when its card opens (not on a fill-in-the-blank card: that would give the answer away).
     if (!revealed && type === 'meaning' && spokenAt !== idx && host.settings.autoSpeakWord) {
       spokenAt = idx;
       say(e.word, host.settings);
     }
+  }
+
+  /** Answer side: Japanese translation of the example sentence and the grammar it uses (links to the 英文法コース). */
+  async function exampleHelp(e) {
+    const text = e.ctx.join(' ');
+    const ja = el.querySelector('.ex-ja');
+    const gram = el.querySelector('.ex-gram');
+    import('./grammarDetect.js')
+      .then(({ detectGrammar }) => {
+        const hits = detectGrammar(text);
+        if (!gram.isConnected) return;
+        gram.innerHTML = hits.length
+          ? hits.map((h) => `<button class="ex-gram-item" data-sec="${h.section.id}"><b>${esc(h.section.id)} ${esc(h.section.title)}</b>
+              <span class="ex-gram-match">“${esc(h.match.replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, ''))}”</span><span>${esc(h.section.points[0])}</span></button>`).join('')
+          : '<p class="muted small">コースで扱う目立った文法の形は見つかりませんでした。</p>';
+        gram.querySelectorAll('[data-sec]').forEach((b) => (b.onclick = () => host.openGrammar?.(b.dataset.sec)));
+      })
+      .catch(() => (gram.innerHTML = '<p class="muted small">文法データを読み込めませんでした（オフライン？）</p>'));
+    // The translation is shown only on request (it uses the free translation quota).
+    el.querySelector('[data-a=show-ja]').onclick = async (ev) => {
+      ev.currentTarget.remove();
+      ja.hidden = false;
+      ja.textContent = '翻訳中…';
+      try {
+        const t = await translate(text, { email: host.settings.mmEmail });
+        if (ja.isConnected) ja.textContent = t;
+      } catch (err) {
+        if (ja.isConnected) {
+          ja.textContent = err instanceof QuotaError
+            ? '今日の無料翻訳の上限に達しました（設定でメールアドレスを登録すると上限が増えます）'
+            : '翻訳できませんでした（オフライン？）';
+          ja.classList.add('muted');
+        }
+      }
+    };
   }
 
   /** After a miss: say it aloud 3 times (word, then the example sentence). */

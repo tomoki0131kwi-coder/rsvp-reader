@@ -1,9 +1,9 @@
 // Offline support. App shell: stale-while-revalidate. Books, dictionary, catalog: cache-first.
-const SHELL_CACHE = 'shell-v17';
+const SHELL_CACHE = 'shell-v19';
 const DATA_CACHE = 'data-v1'; // bump only when bundled books/dictionary change
 const SHELL = [
   './', 'index.html', 'app.css', 'manifest.webmanifest',
-  'js/app.js', 'js/reader.js', 'js/rsvp.js', 'js/text.js', 'js/dict.js', 'js/gutenberg.js', 'js/stats.js', 'js/db.js', 'js/ui.js', 'js/translate.js', 'js/speech.js', 'js/vocab.js', 'js/vocabView.js', 'js/listen.js', 'js/coach.js', 'js/chunk.js', 'js/dictSheet.js', 'js/training.js', 'js/goals.js', 'js/daily.js', 'js/practice.js', 'js/shadowing.js', 'js/composition.js', 'js/speaking.js', 'js/stt.js', 'js/recorder.js', 'js/textdiff.js', 'js/grammar.js', 'js/grammarCourse.js', 'js/grammarView.js',
+  'js/app.js', 'js/reader.js', 'js/rsvp.js', 'js/text.js', 'js/dict.js', 'js/gutenberg.js', 'js/stats.js', 'js/db.js', 'js/ui.js', 'js/translate.js', 'js/speech.js', 'js/vocab.js', 'js/vocabView.js', 'js/listen.js', 'js/coach.js', 'js/chunk.js', 'js/dictSheet.js', 'js/training.js', 'js/goals.js', 'js/daily.js', 'js/practice.js', 'js/shadowing.js', 'js/composition.js', 'js/speaking.js', 'js/stt.js', 'js/recorder.js', 'js/textdiff.js', 'js/grammar.js', 'js/grammarCourse.js', 'js/grammarView.js', 'js/grammarDetect.js',
   'icons/icon-192.png', 'icons/icon-512.png', 'data/library.json', 'data/credits.json', 'data/wordlists.json',
 ];
 
