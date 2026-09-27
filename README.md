@@ -1,6 +1,6 @@
-# RSVP多読
+# 英語学習
 
-RSVP（Rapid Serial Visual Presentation：単語を1語ずつ画面中央に高速表示する方式）で英語の多読をするための、Android向けWebアプリ（PWA）です。Chromeで開いて「ホーム画面に追加」すると、普通のアプリのように全画面・オフラインで使えます。
+RSVP（Rapid Serial Visual Presentation：単語を1語ずつ画面中央に高速表示する方式）での多読を中心に、単語・英文法・シャドーイング・瞬間英作文・スピーチまで1つで学べる、Android向けWebアプリ（PWA）です。Chromeで開いて「ホーム画面に追加」すると、普通のアプリのように全画面・オフラインで使えます。
 
 ## 機能
 

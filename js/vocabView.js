@@ -256,11 +256,12 @@ async function wordSheet(word, host) {
         <button class="icon-btn speak" data-a="speak" aria-label="発音を聞く">${icons.speaker}</button></div>${dots(vocab.strength(e))}</div>
       <div class="dict-pron">${e.pron ? `/${esc(e.pron)}/` : ''}</div>
       <div class="dict-body"><ol>${senses(e.meaning).map((s) => `<li>${fmtSense(s)}</li>`).join('') || '<li class="muted">（英和辞書に未収録）</li>'}</ol></div>
-      ${e.ctx ? `<blockquote class="w-ctx">${contextHtml(e)}<cite>${esc(e.bookTitle || '')}</cite></blockquote>` : ''}
+      ${e.ctx ? `<blockquote class="w-ctx">${contextHtml(e)}<cite>${esc(e.bookTitle || '')}</cite></blockquote><button class="link-btn ctx-say" data-a="say-ctx">🔊 例文を聞く</button>` : ''}
       <p class="muted small">${e.source === 'deck' ? '単語デッキから' : `調べた回数 ${e.seen}回`} · 次の復習 ${whenLabel(e.due)}</p>
       <div class="sheet-actions"><button class="btn danger-ghost" data-a="del">単語帳から削除</button><button class="btn ghost" data-a="close">閉じる</button></div>
     </div>`);
   panel.querySelector('[data-a=speak]').onclick = () => say(e.word, host.settings);
+  panel.querySelector('[data-a=say-ctx]')?.addEventListener('click', () => say(e.ctx.join(' '), host.settings));
   panel.querySelector('[data-a=close]').onclick = () => closeSheet();
   panel.querySelector('[data-a=del]').onclick = async () => {
     await vocab.remove(word);
@@ -298,6 +299,8 @@ export async function startReview(host) {
   const isNew = (e) => e.source === 'deck' && e.reps === 0 && e.lapses === 0;
   const cardType = (e) => (e.reps >= 2 && e.reps % 2 === 0 && e.ctx ? 'cloze' : 'meaning');
   const speakBtn = '<button class="icon-btn speak" data-a="speak" aria-label="発音を聞く">' + icons.speaker + '</button>';
+  const ctxBtn = '<button class="link-btn ctx-say" data-a="say-ctx">🔊 例文を聞く</button>';
+  let spokenAt = -1; // queue position whose word was already read out automatically
 
   function header(left) {
     return `<header class="rv-top"><button class="icon-btn" data-a="back" aria-label="閉じる">${icons.back}</button>
@@ -326,10 +329,10 @@ export async function startReview(host) {
         : `<div class="rv-label">${isNew(e) ? `<span class="new-tag">新しい単語${e.band ? ` Lv${e.band}` : ''}</span> 意味がわかりますか？` : '意味は？'}</div>
            <div class="rv-word">${esc(e.word)} ${speakBtn}</div>
            ${e.pron ? `<div class="rv-pron">/${esc(e.pron)}/</div>` : ''}
-           ${e.ctx ? `<p class="rv-ctx">${contextHtml(e)}</p>` : ''}`;
+           ${e.ctx ? `<p class="rv-ctx">${contextHtml(e)}</p>${ctxBtn}` : ''}`;
     const back = revealed
       ? `<div class="rv-answer">
-          ${type === 'cloze' ? `<div class="rv-word">${esc(e.word)} ${speakBtn}</div>${e.pron ? `<div class="rv-pron">/${esc(e.pron)}/</div>` : ''}<p class="rv-ctx">${contextHtml(e)}</p>` : ''}
+          ${type === 'cloze' ? `<div class="rv-word">${esc(e.word)} ${speakBtn}</div>${e.pron ? `<div class="rv-pron">/${esc(e.pron)}/</div>` : ''}<p class="rv-ctx">${contextHtml(e)}</p>${ctxBtn}` : ''}
           <ol>${senses(e.meaning, 5).map((s) => `<li>${fmtSense(s)}</li>`).join('') || '<li class="muted">（英和辞書に未収録）</li>'}</ol>
           ${e.bookTitle ? `<cite>${esc(e.bookTitle)}</cite>` : ''}
         </div>`
@@ -343,7 +346,13 @@ export async function startReview(host) {
     el.querySelector('[data-a=back]').onclick = () => popLayer();
     el.querySelector('[data-a=show]')?.addEventListener('click', reveal);
     el.querySelectorAll('[data-a=speak]').forEach((b) => (b.onclick = () => say(e.word, host.settings)));
+    el.querySelectorAll('[data-a=say-ctx]').forEach((b) => (b.onclick = () => say(e.ctx.join(' '), host.settings)));
     el.querySelectorAll('[data-g]').forEach((b) => (b.onclick = () => answer(Number(b.dataset.g))));
+    // Read the word out once when its card opens (not on a fill-in-the-blank card: that would give the answer away).
+    if (!revealed && type === 'meaning' && spokenAt !== idx && host.settings.autoSpeakWord) {
+      spokenAt = idx;
+      say(e.word, host.settings);
+    }
   }
 
   /** After a miss: say it aloud 3 times (word, then the example sentence). */
@@ -355,7 +364,7 @@ export async function startReview(host) {
         <div class="rv-word">${esc(e.word)} ${speakBtn}</div>
         ${e.pron ? `<div class="rv-pron">/${esc(e.pron)}/</div>` : ''}
         <div class="rv-answer"><ol>${senses(e.meaning, 2).map((s) => `<li>${fmtSense(s)}</li>`).join('')}</ol></div>
-        ${e.ctx ? `<p class="rv-ctx">${contextHtml(e)}</p><button class="link-btn" data-a="say-ctx">例文を聞く</button>` : ''}
+        ${e.ctx ? `<p class="rv-ctx">${contextHtml(e)}</p>${ctxBtn}` : ''}
         <p class="muted small">意味をイメージしながら読むと定着しやすくなります。</p>
       </div>
       <div class="rv-actions">
@@ -376,7 +385,7 @@ export async function startReview(host) {
   function reveal() {
     revealed = true;
     render();
-    if (cardType(card()) === 'cloze') say(card().word, host.settings);
+    if (host.settings.autoSpeakWord) say(card().word, host.settings);
   }
 
   async function answer(g) {

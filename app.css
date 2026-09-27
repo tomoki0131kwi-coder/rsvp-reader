@@ -840,3 +840,4 @@ mark { background: var(--accent-soft); color: inherit; border-radius: 3px; paddi
 .gm-bar b { display: block; height: 100%; background: var(--primary); }
 .gm-list.open .gm-ch { border-bottom: 1px solid var(--line); }
 .gm-list { margin-bottom: 8px; }
+.ctx-say { align-self: flex-start; text-decoration: none; color: var(--primary); font-size: 13.5px; padding: 2px 0; }

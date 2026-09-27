@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS = {
   theme: 'system', goal: 3000, dictMode: 'ja', proxy: '', showJa: false, mmEmail: '', voice: '', autoSaveWords: true,
   listen: false, comprehensionCheck: true,
   goalWpm: goals.DEFAULT_GOAL.wpm, goalComp: goals.DEFAULT_GOAL.comp, readAloudGoal: 5,
-  wordGoal: 50, readAloudOnMiss: true, hideText: false,
+  wordGoal: 50, readAloudOnMiss: true, autoSpeakWord: true, hideText: false,
   daily: structuredClone(DEFAULT_DAILY),
 };
 const LEVELS = {
@@ -266,7 +266,7 @@ function viewLibrary() {
   const reading = S.shelf.filter((b) => !b.finished).sort((a, b) => b.lastReadAt - a.lastReadAt);
   const done = S.shelf.filter((b) => b.finished).sort((a, b) => b.lastReadAt - a.lastReadAt);
   const header = `<header class="top">
-      <div><h1>RSVP多読</h1><p class="muted">累計 <b>${fmt(sum.words)}</b> 語</p></div>
+      <div><h1>本棚</h1><p class="muted">累計 <b>${fmt(sum.words)}</b> 語</p></div>
       <div class="today">${ring(sum.today.w / S.settings.goal)}<div><small>今日</small><b>${fmt(sum.today.w)}</b><small>/ ${fmt(S.settings.goal)}語</small></div></div>
     </header>`;
   if (!S.shelf.length) {
@@ -512,6 +512,7 @@ function viewSettings() {
       <div class="row"><span>目標の理解度</span>${seg('goalComp', [[60, '60%'], [70, '70%'], [80, '80%'], [90, '90%']])}</div>
       <div class="row"><span>辞書</span>${seg('dictMode', [['ja', '英和'], ['en', '英英']])}</div>
       <label class="row"><span>1日の単語学習の目標<small>復習と新しい単語の合計回数</small></span><input type="number" id="wordGoal" min="5" max="500" step="5" inputmode="numeric" value="${s.wordGoal}"></label>
+      <label class="row"><span>単語を自動で読み上げる<small>学習で単語のカードを開いたときと「答えを見る」を押したときに、発音を1回ずつ再生します（例文は🔊で再生）</small></span><input type="checkbox" class="switch" id="autoSpeakWord" ${s.autoSpeakWord ? 'checked' : ''}></label>
       <label class="row"><span>間違えたら音読3回<small>復習で「もう一度」を選んだとき、発音を聞いて声に出して読む練習をはさみます</small></span><input type="checkbox" class="switch" id="readAloudOnMiss" ${s.readAloudOnMiss ? 'checked' : ''}></label>
       <label class="row"><span>調べた単語を単語帳に保存<small>辞書で引いた単語を、出てきた英文と一緒に自動で保存します</small></span><input type="checkbox" class="switch" id="autoSaveWords" ${s.autoSaveWords ? 'checked' : ''}></label>
       <label class="stack"><span>読み上げ音声<small>辞書の🔊で使う英語の音声</small></span>
@@ -631,7 +632,7 @@ function bindView(view) {
   if (wpm) {
     wpm.addEventListener('input', () => ($('#wpm-val').textContent = wpm.value));
     wpm.addEventListener('change', () => saveSettings({ wpm: Number(wpm.value) }));
-    for (const id of ['rewind', 'orp', 'showJa', 'autoSaveWords', 'listen', 'comprehensionCheck', 'readAloudOnMiss', 'hideText']) $(`#${id}`).addEventListener('change', (e) => saveSettings({ [id]: e.target.checked }));
+    for (const id of ['rewind', 'orp', 'showJa', 'autoSaveWords', 'listen', 'comprehensionCheck', 'readAloudOnMiss', 'autoSpeakWord', 'hideText']) $(`#${id}`).addEventListener('change', (e) => saveSettings({ [id]: e.target.checked }));
     $('#goal').addEventListener('change', (e) => saveSettings({ goal: Math.max(100, Number(e.target.value) || DEFAULT_SETTINGS.goal) }));
     $('#wordGoal').addEventListener('change', (e) => saveSettings({ wordGoal: Math.min(500, Math.max(5, Number(e.target.value) || DEFAULT_SETTINGS.wordGoal)) }));
     $('#goalWpm').addEventListener('change', (e) => saveSettings({ goalWpm: Math.min(600, Math.max(50, Number(e.target.value) || DEFAULT_SETTINGS.goalWpm)) }));

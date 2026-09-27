@@ -1,7 +1,7 @@
 {
-  "name": "RSVP多読 — 英語速読リーダー",
-  "short_name": "RSVP多読",
-  "description": "RSVP（高速逐次提示）で英語の多読ができるリーダー。Project Gutenbergの名作を収録。",
+  "name": "英語学習",
+  "short_name": "英語学習",
+  "description": "RSVP多読・単語・英文法・シャドーイング・瞬間英作文・スピーチを1つで学ぶ英語学習アプリ。",
   "lang": "ja",
   "start_url": "./",
   "scope": "./",

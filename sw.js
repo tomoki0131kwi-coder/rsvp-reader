@@ -1,5 +1,5 @@
 // Offline support. App shell: stale-while-revalidate. Books, dictionary, catalog: cache-first.
-const SHELL_CACHE = 'shell-v13';
+const SHELL_CACHE = 'shell-v15';
 const DATA_CACHE = 'data-v1'; // bump only when bundled books/dictionary change
 const SHELL = [
   './', 'index.html', 'app.css', 'manifest.webmanifest',

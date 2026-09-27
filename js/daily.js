@@ -256,8 +256,8 @@ function googleCalendarUrl(hhmm) {
   const end = new Date(start.getTime() + 15 * 60000);
   const q = new URLSearchParams({
     action: 'TEMPLATE',
-    text: '英語の学習（RSVP多読）',
-    details: 'RSVP多読の「今日」タブでチェックリストを確認しましょう。',
+    text: '英語の学習（英語学習アプリ）',
+    details: '英語学習アプリの「今日」タブでチェックリストを確認しましょう。',
     dates: `${stamp(start)}/${stamp(end)}`,
     recur: 'RRULE:FREQ=DAILY',
   });
@@ -270,7 +270,7 @@ function downloadIcs(hhmm) {
   const ics = [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//RSVP Tadoku//JA', 'BEGIN:VEVENT',
     `UID:rsvp-daily-${Date.now()}@rsvp-reader`, `DTSTAMP:${utc}`, `DTSTART:${stamp(start)}`, 'DURATION:PT15M', 'RRULE:FREQ=DAILY',
-    'SUMMARY:英語の学習（RSVP多読）', 'DESCRIPTION:「今日」タブでチェックリストを確認しましょう。',
+    'SUMMARY:英語の学習（英語学習アプリ）', 'DESCRIPTION:「今日」タブでチェックリストを確認しましょう。',
     'BEGIN:VALARM', 'TRIGGER:PT0M', 'ACTION:DISPLAY', 'DESCRIPTION:英語の学習の時間です', 'END:VALARM',
     'END:VEVENT', 'END:VCALENDAR',
   ].join('\r\n');
